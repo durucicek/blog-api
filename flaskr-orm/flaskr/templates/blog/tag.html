@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Tags{% endblock %}
+
+{% block header %}
+  <h1>Tags and Their Posts</h1>
+{% endblock %}
+
+{% block content %}
+  <ul>
+    {% for tag in tags %}
+      <li>
+        <strong>{{ tag.name }}</strong>
+        <ul>
+          {% for post in tag.post %}
+            <li>{{post.title}}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

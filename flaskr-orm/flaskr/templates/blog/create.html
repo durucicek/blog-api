@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}New Post{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+
+    <!-- Title Field -->
+    <label for="title">Title</label>
+    <input type="text" name="title" id="title" value="{{ request.form.get('title', '') }}" required>
+
+    <!-- Body Field -->
+    <label for="body">Body</label>
+    <textarea name="body" id="body">{{ request.form.get('body', '') }}</textarea>
+
+    <!-- Tags Selection Dropdown -->
+    <label for="tags">Choose Tags</label>
+    <select name="tags" id="tags" multiple>
+      {% for tag in tags %}
+        <option value="{{ tag.id }}">{{ tag.name }}</option>
+      {% endfor %}
+    </select>
+
+    <!-- New Tag Field and Button -->
+    <label for="newTag">Add New Tag:</label>
+    <input type="text" id="newTag">
+    <button type="button" onclick="submitNewTag()">Add New Tag</button>
+
+    <!-- Submit Button for the Form -->
+    <input type="submit" value="Save">
+  </form>
+
+  <script>
+    function submitNewTag() {
+      const tagName = document.getElementById('newTag').value;
+      if (!tagName) {
+        alert("Please enter a tag name.");
+        return;
+      }
+
+      fetch('/add-tag', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tag_name: tagName })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const tagsSelect = document.getElementById('tags');
+          const newOption = new Option(data.tagName, data.tagId, false, true);
+          tagsSelect.appendChild(newOption);
+          document.getElementById('newTag').value = '';  // Clear the input field after successful addition
+          alert("Tag added successfully!");
+        } else {
+          alert("Failed to add tag: " + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error adding tag:', error);
+        alert("Failed to add tag due to an error.");
+      });
+    }
+  </script>
+{% endblock %}
